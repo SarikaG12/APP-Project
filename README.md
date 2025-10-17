@@ -1,4 +1,4 @@
-# Student Management Application
+# Student Registration Application
 
 This Java project is a **Student Management Application** using **Swing GUI** and **MySQL database**.  
 It allows users to **add, view, update, and delete student records**.
@@ -62,4 +62,5 @@ Ensure MySQL server is running before running the Java programs.
 Update the JDBC URL and credentials in the Java files as needed.
 
 ViewStudents.java is for console-based viewing; ManageStudents.java provides a GUI for updates/deletions.
+
 
