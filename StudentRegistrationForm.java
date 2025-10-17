@@ -1,6 +1,9 @@
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -75,15 +78,14 @@ public class StudentRegistrationForm extends JFrame implements ActionListener {
                     || gender.equals("Select") || course.equals("Select")) {
                 JOptionPane.showMessageDialog(this, "Please fill all fields!", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(this,
-                        "Registration Successful!\n\nName: " + name +
-                        "\nRoll No: " + roll +
-                        "\nEmail: " + email +
-                        "\nPhone: " + phone +
-                        "\nGender: " + gender +
-                        "\nCourse: " + course,
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE);
+                boolean saved = saveToDatabase(name, roll, email, phone, gender, course);
+                if (saved) {
+                    JOptionPane.showMessageDialog(this, "Registration Successful and saved to database!",
+                            "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error saving to database!", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         } else if (e.getSource() == resetButton) {
             nameField.setText("");
@@ -92,6 +94,37 @@ public class StudentRegistrationForm extends JFrame implements ActionListener {
             phoneField.setText("");
             genderBox.setSelectedIndex(0);
             courseBox.setSelectedIndex(0);
+        }
+    }
+
+    private boolean saveToDatabase(String name, String roll, String email, String phone, String gender,
+                                   String course) {
+        try {
+            // Load MySQL driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Connect to MySQL
+            Connection con = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/studentdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
+                    "root",
+                    "Ram@2001"
+            );
+
+            String query = "INSERT INTO students(name, roll, email, phone, gender, course) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement pst = con.prepareStatement(query);
+            pst.setString(1, name);
+            pst.setString(2, roll);
+            pst.setString(3, email);
+            pst.setString(4, phone);
+            pst.setString(5, gender);
+            pst.setString(6, course);
+
+            pst.executeUpdate();
+            con.close();
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
         }
     }
 
